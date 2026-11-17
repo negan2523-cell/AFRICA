@@ -1,0 +1,616 @@
+<!-- Chosen Palette: Warm Academic Neutral (Background: #FBF9F5, Surface: #FFFFFF, Primary Text: #1E293B, Muted Text: #475569, Primary Accent: #1E3A8A [Institutional Blue], Secondary Accent: #B45309 [Warm Terracotta]) -->
+<!-- Application Structure Plan: The SPA maintains an interactive four-part academic exploratory structure tailored to 11th-grade Social Sciences synthesis: 1) Executive Synthesis & KPI Dashboard with interactive citation inspection; 2) Material & Ecological Asymmetry Lab combining a dynamic Chart.js visualization of DRC's 74.2% Cobalt dominance and artisanal mining share with an interactive 3-stage process explorer of the Basel Convention e-waste flow in Agbogbloshie, Ghana, enriched with the documentary photograph ('Ghana.png'); 3) Digital Colonialism & Media Bias Comparator featuring an interactive Chart.js bar comparison of negative media framing (88% Kenya vs 48% Asia) and sovereign debt interest penalties alongside structural vectors of digital dependency; and 4) Sociopolitical & Ethical Analysis Studio for Point 4, embedding the satirical political cartoon ('Caricatura.png' by Albert Ohams) directly alongside the formal ethical/political justification and a searchable academic citation index. -->
+<!-- Visualization & Content Choices: 1) DRC Cobalt Dominance & Mining Sector Split (Doughnut Chart - Chart.js Canvas) -> Goal: Inform/Compare -> Visualizes the 74.2% global share (230k metric tons) and toggles to the 15%-30% artisanal mining vulnerability -> Interactive dataset switcher. 2) Media Bias & Sovereign Risk Framing (Bar Chart - Chart.js Canvas) -> Goal: Compare -> Contrasts 88% negative media coverage in Kenya vs 48% in comparable Asian economies alongside the US$ 4,200M annual sovereign debt interest penalty -> Interactive metric toggle. 3) Agbogbloshie E-Waste Supply Chain -> Goal: Change/Process -> Interactive step-by-step HTML/Tailwind progression paired with the documentary photograph ('Ghana.png') detailing the 62M metric tons generated in 2022, Basel Convention loopholes, and Odaw River bioaccumulation. 4) Point 4 Satirical Political Cartoon -> Goal: Organize/Synthesize -> Integrates the primary visual artifact ('Caricatura.png' by Albert Ohams) directly inside the Point 4 analysis panel with formal ethical justification. -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Cara Oculta de la Integración Global: África, Extractivismo y Resistencia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FBF9F5;
+            color: #1E293B;
+        }
+        h1, h2, h3, .serif-heading {
+            font-family: 'Merriweather', serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 560px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 280px;
+            max-height: 360px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 320px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <nav class="sticky top-0 z-50 bg-[#FBF9F5]/95 backdrop-blur border-b border-stone-200">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-2.5">
+                <span class="inline-block w-3 h-3 rounded-sm bg-[#1E3A8A]"></span>
+                <span class="font-bold text-sm sm:text-base text-slate-900 tracking-tight">Ciencias Sociales • Grado 11°</span>
+            </div>
+            <div class="hidden md:flex items-center space-x-6 text-sm font-medium text-slate-600">
+                <a href="#sustrato-material" class="hover:text-[#1E3A8A] transition-colors">Extractivismo y E-Waste</a>
+                <a href="#colonialismo-digital" class="hover:text-[#1E3A8A] transition-colors">Colonialismo Digital</a>
+                <a href="#analisis-punto4" class="hover:text-[#1E3A8A] transition-colors">Análisis Punto 4</a>
+                <a href="#soberania-tecnologica" class="hover:text-[#1E3A8A] transition-colors">Soberanía y Resistencia</a>
+            </div>
+            <a href="#fuentes-academicas" class="text-xs font-semibold px-3 py-1.5 rounded border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 transition-colors">
+                Índice de Fuentes
+            </a>
+        </div>
+    </nav>
+
+    <header class="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 border-b border-stone-200 bg-white">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-xs font-bold uppercase tracking-widest text-[#1E3A8A] mb-3">
+                Documento Académico • Guía de Aprendizaje 2: Globalización y Medios de Comunicación Masiva
+            </div>
+            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 leading-tight mb-5">
+                La Cara Oculta de la Integración Global: <span class="text-[#1E3A8A]">África, Extractivismo y Resistencia</span>
+            </h1>
+            <p class="text-base sm:text-lg text-slate-600 leading-relaxed max-w-4xl mb-8">
+                Este informe interactivo examina las asimetrías estructurales de la globalización contemporánea. A través de evidencia empírica y registro visual, permite explorar cómo la transición energética y la economía digital dependen de la extracción mineral en África y la exportación de residuos electrónicos, al tiempo que los sesgos mediáticos encarecen el desarrollo del continente y conviven con procesos de soberanía tecnológica.
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="kpi-grid">
+                <button type="button" onclick="highlightCitation(1)" class="text-left p-5 rounded-xl bg-[#FBF9F5] border border-stone-200 hover:border-[#1E3A8A] transition-all">
+                    <div class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Suministro de Cobalto</div>
+                    <div class="text-2xl sm:text-3xl font-bold text-[#1E3A8A]">74,2%</div>
+                    <p class="text-xs text-slate-600 mt-1.5">Extraído en la R.D. del Congo (230.000 toneladas métricas) [Cita 1, 5].</p>
+                </button>
+                <button type="button" onclick="highlightCitation(2)" class="text-left p-5 rounded-xl bg-[#FBF9F5] border border-stone-200 hover:border-[#1E3A8A] transition-all">
+                    <div class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Costo de Estereotipos</div>
+                    <div class="text-2xl sm:text-3xl font-bold text-[#B45309]">US$ 4.200M</div>
+                    <p class="text-xs text-slate-600 mt-1.5">Sobrecosto anual en intereses de deuda soberana por sesgos [Cita 2, 16].</p>
+                </button>
+                <button type="button" onclick="highlightCitation(3)" class="text-left p-5 rounded-xl bg-[#FBF9F5] border border-stone-200 hover:border-[#1E3A8A] transition-all">
+                    <div class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Basura Electrónica</div>
+                    <div class="text-2xl sm:text-3xl font-bold text-slate-900">62 Millones</div>
+                    <p class="text-xs text-slate-600 mt-1.5">Toneladas de e-waste generadas globalmente en 2022 [Cita 3].</p>
+                </button>
+                <button type="button" onclick="highlightCitation(4)" class="text-left p-5 rounded-xl bg-[#FBF9F5] border border-stone-200 hover:border-[#1E3A8A] transition-all">
+                    <div class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Infraestructura Foránea</div>
+                    <div class="text-2xl sm:text-3xl font-bold text-[#1E3A8A]">85% - 95%</div>
+                    <p class="text-xs text-slate-600 mt-1.5">Del tráfico de internet africano controlado por capital extranjero [Cita 4].</p>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14 space-y-20">
+
+        <section id="sustrato-material" class="scroll-mt-20">
+            <div class="max-w-3xl mb-8">
+                <div class="text-xs font-bold uppercase tracking-widest text-[#B45309] mb-1">Sección 01 • Dimensión Material y Ecológica</div>
+                <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">El Sustrato Material: Cobalto en la RDC y Ciclo Tóxico en Ghana</h2>
+                <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
+                    Esta sección analiza los dos extremos físicos de la cadena tecnológica global. En primer lugar, la dependencia de las energías limpias respecto al cobalto congoleño; en segundo lugar, el traslado de residuos electrónicos hacia África occidental bajo vacíos normativos internacionales. Utilice los controles interactivos para alternar las métricas de extracción y explorar las fases del ciclo de residuos en Agbogbloshie.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+                <div class="lg:col-span-6 bg-white p-6 rounded-2xl border border-stone-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <h3 class="text-lg font-bold text-slate-900">Geopolítica del Cobalto (R.D. Congo)</h3>
+                            <div class="inline-flex rounded-lg border border-stone-200 bg-[#FBF9F5] p-0.5 text-xs">
+                                <button type="button" id="btn-cobalt-world" class="px-2.5 py-1 rounded-md bg-[#1E3A8A] text-white font-semibold transition">Suministro Mundial</button>
+                                <button type="button" id="btn-cobalt-sector" class="px-2.5 py-1 rounded-md text-slate-600 font-semibold hover:text-slate-900 transition">Estructura Interna</button>
+                            </div>
+                        </div>
+                        <p id="cobalt-description" class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
+                            La República Democrática del Congo produce 230.000 toneladas métricas de cobalto, concentrando el 74,2% del suministro minero mundial indispensable para baterías y electrónica [Cita 1, 5].
+                        </p>
+                    </div>
+
+                    <div class="chart-container my-2">
+                        <canvas id="cobaltChart"></canvas>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-stone-100 text-xs text-slate-500">
+                        Nota: Entre el 15% y el 30% del cobalto congoleño proviene de minería artesanal e informal en condiciones de alta precariedad [Cita 6, 7].
+                    </div>
+                </div>
+
+                <div class="lg:col-span-6 bg-white p-6 rounded-2xl border border-stone-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="text-xs font-bold uppercase tracking-wider text-[#B45309] mb-1">Estudio de Caso Ambiental</div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">El Ciclo Tóxico del E-Waste en Agbogbloshie, Ghana</h3>
+                        <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
+                            Seleccione cada etapa del flujo transfronterizo para examinar cómo la obsolescencia programada del Norte Global evade el Convenio de Basilea e impacta la salud pública africana [Cita 3, 8, 9].
+                        </p>
+
+                        <div class="grid grid-cols-3 gap-2 mb-4">
+                            <button type="button" onclick="setEwasteStage(0)" class="ewaste-tab py-2 px-2.5 rounded-lg text-xs font-semibold bg-[#1E3A8A] text-white text-center transition">1. Generación (62M t)</button>
+                            <button type="button" onclick="setEwasteStage(1)" class="ewaste-tab py-2 px-2.5 rounded-lg text-xs font-semibold bg-[#FBF9F5] text-slate-700 border border-stone-200 text-center hover:bg-stone-100 transition">2. Vacío de Basilea</button>
+                            <button type="button" onclick="setEwasteStage(2)" class="ewaste-tab py-2 px-2.5 rounded-lg text-xs font-semibold bg-[#FBF9F5] text-slate-700 border border-stone-200 text-center hover:bg-stone-100 transition">3. Bioacumulación</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-[#FBF9F5] border border-stone-200 rounded-xl p-4 sm:p-5 flex-grow flex flex-col justify-between">
+                        <div>
+                            <div class="mb-3 rounded-lg overflow-hidden border border-stone-300 bg-slate-900">
+                                <img src="Ghana.png" alt="Quema informal de desechos electrónicos y cables en el vertedero de Agbogbloshie, Accra, Ghana" class="w-full h-44 sm:h-48 object-cover block">
+                                <div class="px-3 py-1.5 bg-slate-900 text-[11px] text-slate-300 flex items-center justify-between">
+                                    <span>Registro documental: Vertedero de Agbogbloshie (Accra, Ghana)</span>
+                                    <span class="text-amber-300 font-semibold">[Cita 10]</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span id="ewaste-stage-badge" class="text-xs font-bold uppercase tracking-wider text-[#1E3A8A]">Etapa 01 / 03</span>
+                                <span id="ewaste-stage-ref" class="text-xs text-slate-500 font-medium">[Cita 3]</span>
+                            </div>
+                            <h4 id="ewaste-stage-title" class="text-base font-bold text-slate-900 mb-1.5">Obsolescencia Programada y Descarte Masivo</h4>
+                            <p id="ewaste-stage-text" class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                                En 2022, la economía global generó 62 millones de toneladas de desechos electrónicos (e-waste). En el extremo opuesto del ciclo de consumo mineral, África recibe las externalidades negativas de dispositivos descartados prematuramente en las economías industrializadas.
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-3 mt-4 pt-3 border-t border-stone-200 text-center">
+                            <div>
+                                <div class="text-sm font-bold text-slate-900">62M Ton</div>
+                                <div class="text-[11px] text-slate-500">Residuos (2022)</div>
+                            </div>
+                            <div>
+                                <div class="text-sm font-bold text-[#B45309]">Pb, Cd, Hg</div>
+                                <div class="text-[11px] text-slate-500">Metales pesados</div>
+                            </div>
+                            <div>
+                                <div class="text-sm font-bold text-[#1E3A8A]">Río Odaw</div>
+                                <div class="text-[11px] text-slate-500">Cauce afectado</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="colonialismo-digital" class="scroll-mt-20 pt-4">
+            <div class="max-w-3xl mb-8">
+                <div class="text-xs font-bold uppercase tracking-widest text-[#1E3A8A] mb-1">Sección 02 • Infraestructura de Datos y Narrativas</div>
+                <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">Colonialismo Digital y el Costo Financiero de los Estereotipos</h2>
+                <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
+                    La dominación territorial histórica ha evolucionado hacia el control de redes submarinas, centros de datos y algoritmos. En esta sección puede comparar estadísticamente el sesgo mediático internacional y analizar cómo la arquitectura digital extractiva penaliza financieramente a las economías africanas.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <div class="lg:col-span-6 bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <h3 class="text-lg font-bold text-slate-900">Asimetría en Cobertura Mediática Electoral</h3>
+                        <div class="inline-flex rounded-lg border border-stone-200 bg-[#FBF9F5] p-0.5 text-xs">
+                            <button type="button" id="btn-media-tone" class="px-2.5 py-1 rounded-md bg-[#1E3A8A] text-white font-semibold transition">Tono de Noticias (%)</button>
+                            <button type="button" id="btn-media-cost" class="px-2.5 py-1 rounded-md text-slate-600 font-semibold hover:text-slate-900 transition">Impacto Financiero</button>
+                        </div>
+                    </div>
+                    <p id="media-description" class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
+                        Durante periodos electorales, el 88% de las noticias globales sobre Kenia adoptaron un tono negativo, frente a solo un 48% para economías asiáticas con un perfil de riesgo político idéntico [Cita 17, 18].
+                    </p>
+
+                    <div class="chart-container my-2">
+                        <canvas id="mediaBiasChart"></canvas>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-stone-100 text-xs text-slate-500">
+                        Fuente: Informe de evaluación de riesgo y estereotipos mediáticos (2024) [Cita 2, 16, 17, 18].
+                    </div>
+                </div>
+
+                <div class="lg:col-span-6 space-y-4">
+                    <div class="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-[#1E3A8A]">Vector 1: Control de Infraestructura</span>
+                            <span class="text-xs font-semibold text-slate-500">85% - 95% [Cita 4]</span>
+                        </div>
+                        <h4 class="text-base font-bold text-slate-900 mb-2">Dependencia de Cables Submarinos y Redes</h4>
+                        <p class="text-sm text-slate-600 leading-relaxed">
+                            Entre el 85% y el 95% del tráfico internacional de internet en África transita por infraestructuras controladas por capitales extranjeros. Esto consolida un modelo donde las corporaciones extraen datos conductuales locales como materia prima gratuita para entrenar algoritmos foráneos, marginando las lenguas y contextos nativos [Cita 4, 13].
+                        </p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-[#B45309]">Vector 2: Economía de la Atención</span>
+                            <span class="text-xs font-semibold text-slate-500">US$ 4.200M / año [Cita 2]</span>
+                        </div>
+                        <h4 class="text-base font-bold text-slate-900 mb-2">Sobrecosto en Intereses de Deuda Soberana</h4>
+                        <p class="text-sm text-slate-600 leading-relaxed">
+                            Los algoritmos y medios internacionales priorizan narrativas de crisis, conflicto y pobreza [Cita 14, 15]. Este encuadre sostenido eleva artificialmente la percepción de riesgo financiero, imponiendo a los países africanos un sobrecosto cuantificado en 4.200 millones de dólares anuales en intereses de deuda soberana [Cita 2, 16].
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="analisis-punto4" class="scroll-mt-20 pt-4">
+            <div class="max-w-3xl mb-8">
+                <div class="text-xs font-bold uppercase tracking-widest text-[#B45309] mb-1">Sección 03 • Resolución del Punto 4</div>
+                <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">Análisis Sociopolítico: Sátira Crítica y Asimetría de Poder</h2>
+                <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
+                    La caricatura política africana contemporánea —ejemplificada en la obra de Albert Ohams (Nigeria)— opera como un dispositivo crítico para visibilizar las contradicciones ocultas tras el discurso de la integración global. Examine la pieza gráfica seleccionada y revise la justificación ética y política completa.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-12">
+                    <div class="lg:col-span-6 p-6 bg-[#FBF9F5] border-b lg:border-b-0 lg:border-r border-stone-200 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-xs font-bold uppercase tracking-wider text-slate-600">Pieza Visual • Sátira Política</span>
+                                <span class="text-xs font-semibold text-[#1E3A8A]">Albert Ohams (Nigeria)</span>
+                            </div>
+                            <div class="w-full max-w-[500px] mx-auto rounded-xl overflow-hidden border border-stone-300 bg-white shadow-sm">
+                                <img src="Caricatura.png" alt="Caricatura política de Albert Ohams sobre asimetría de poder, megáfono de medios oficiales y silenciación" class="w-full h-auto block object-contain">
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-stone-200 text-xs text-slate-600 text-center">
+                            Sátira Política: La asimetría del poder y el control mediático — Albert Ohams (Nigeria) [Cita 19, 20].
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-6 p-6 sm:p-8 flex flex-col justify-center">
+                        <div class="inline-block px-3 py-1 rounded text-xs font-bold bg-blue-50 text-[#1E3A8A] border border-blue-200 w-fit mb-4">
+                            Justificación Ética y Política (Punto 4)
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-4">Deconstrucción de la Hipocresía Globalizada</h3>
+                        <div class="space-y-4 text-sm text-slate-700 leading-relaxed bg-[#FBF9F5] p-5 rounded-xl border-l-4 border-[#1E3A8A]">
+                            <p>
+                                La caricatura política africana contemporánea funciona como un mecanismo discursivo esencial para denunciar la represión y las asimetrías de poder [Cita 19, 20]. Esta pieza gráfica ilustra a la perfección la hipocresía de una globalización desigual.
+                            </p>
+                            <p>
+                                Mientras los medios masivos de comunicación y los algoritmos iluminan trivialidades o perpetúan estereotipos del Norte Global, en la oscuridad se mantiene intacta una maquinaria extractivista y de silenciamiento institucional. Se normaliza la sustracción de recursos y la invisibilización de un continente rico.
+                            </p>
+                            <p>
+                                La homogeneización del consumo nos hace cómplices silenciosos al desconectarnos de la cruda realidad política y material que enfrentan estas naciones para sostener el estilo de vida global.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="soberania-tecnologica" class="scroll-mt-20 pt-4">
+            <div class="max-w-3xl mb-8">
+                <div class="text-xs font-bold uppercase tracking-widest text-[#1E3A8A] mb-1">Sección 04 • Agencia y Autonomía</div>
+                <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">Soberanía y Resistencia Tecnológica en África</h2>
+                <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
+                    Frente a la subordinación extractiva y algorítmica, las sociedades africanas impulsan estrategias endógenas de innovación financiera, inteligencia artificial lingüística y autodeterminación cultural. Seleccione cada pilar para examinar su impacto estructural.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="text-xs font-bold uppercase tracking-wider text-[#1E3A8A] mb-2">01. Salto Tecnológico</div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-3">Silicon Savannah e Inclusión Financiera</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed">
+                            En ecosistemas de innovación como Silicon Savannah en Nairobi (Kenia), han surgido plataformas digitales pioneras a nivel mundial que revolucionaron la inclusión financiera de millones de personas mediante telefonía móvil, superando la ausencia de infraestructura bancaria tradicional obsoleta [Cita 21, 22].
+                        </p>
+                    </div>
+                    <div class="mt-5 pt-3 border-t border-stone-100 text-xs font-semibold text-slate-500">
+                        Nairobi, Kenia • [Cita 21, 22]
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="text-xs font-bold uppercase tracking-wider text-[#B45309] mb-2">02. Soberanía de Datos</div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-3">IA y PLN para Lenguas Indígenas</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed">
+                            Para revertir la exclusión epistémica de los modelos algorítmicos occidentales, redes de investigación de base comunitaria desarrollan de manera colaborativa herramientas de Inteligencia Artificial y Procesamiento de Lenguaje Natural (PLN) para cientos de lenguas indígenas africanas [Cita 23, 24].
+                        </p>
+                    </div>
+                    <div class="mt-5 pt-3 border-t border-stone-100 text-xs font-semibold text-slate-500">
+                        Investigación Comunitaria • [Cita 23, 24]
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="text-xs font-bold uppercase tracking-wider text-[#1E3A8A] mb-2">03. Narrativas Soberanas</div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-3">Cosmogonía Local y Futuro Tecnológico</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed">
+                            Mediante movimientos culturales contemporáneos, se entrelaza la tecnología avanzada con la cosmogonía local para proyectar narrativas propias donde África deja de ser representada como víctima pasiva y se consolida como fuerza creadora y soberana de su propio futuro [Cita 25, 26].
+                        </p>
+                    </div>
+                    <div class="mt-5 pt-3 border-t border-stone-100 text-xs font-semibold text-slate-500">
+                        Autodeterminación Cultural • [Cita 25, 26]
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="fuentes-academicas" class="scroll-mt-20 pt-4">
+            <div class="bg-white p-6 sm:p-8 rounded-2xl border border-stone-200 shadow-sm">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-200 pb-4 mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">Registro de Evidencia Empírica y Referencias del Informe</h2>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-1">Respaldo documental correspondiente a las citas numeradas en el texto académico.</p>
+                    </div>
+                    <input type="text" id="citation-search" placeholder="Filtrar por tema o número..." class="px-3.5 py-2 rounded-lg border border-stone-300 text-sm text-slate-800 bg-[#FBF9F5] focus:outline-none focus:border-[#1E3A8A]">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs sm:text-sm" id="citations-list">
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-900 text-slate-300 py-10 px-4 sm:px-6 lg:px-8 mt-12">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs sm:text-sm">
+            <div>
+                <p class="font-bold text-white">Documento Académico • Ciencias Sociales (Grado 11°)</p>
+                <p class="text-slate-400 mt-1">Elaborado para la resolución de la Guía de aprendizaje 2: Globalización y Medios de comunicación masiva.</p>
+            </div>
+            <div class="text-slate-400 text-xs">
+                Observatorio de Integración Global y África
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const ewasteStages = [
+            {
+                badge: 'Etapa 01 / 03',
+                ref: '[Cita 3]',
+                title: 'Obsolescencia Programada y Descarte Masivo',
+                text: 'En 2022, la economía global generó 62 millones de toneladas de desechos electrónicos (e-waste). En el extremo opuesto del ciclo de consumo mineral, África recibe las externalidades negativas de dispositivos descartados prematuramente en las economías industrializadas.'
+            },
+            {
+                badge: 'Etapa 02 / 03',
+                ref: '[Cita 8, 9]',
+                title: 'Evasión del Convenio de Basilea',
+                text: 'A pesar de que tratados internacionales como el Convenio de Basilea prohíben explícitamente la exportación de residuos peligrosos hacia países en desarrollo, los intermediarios comerciales explotan vacíos legales —como la excepción para "productos reparables"— para introducir chatarra electrónica tóxica en el continente.'
+            },
+            {
+                badge: 'Etapa 03 / 03',
+                ref: '[Cita 10, 11, 12]',
+                title: 'Incineración Informal y Bioacumulación Hídrica',
+                text: 'En centros de reciclaje informal como Agbogbloshie, la recuperación manual y la incineración al aire libre de cables liberan metales pesados letales como plomo, cadmio y mercurio. Estos contaminantes se filtran en cauces como el río Odaw y se bioacumulan en la cadena alimentaria local (cultivos, peces y ganado).'
+            }
+        ];
+
+        const citationsData = [
+            { id: 1, tag: 'Minería', text: 'Servicio Geológico de EE. UU. (USGS) — Participación del 74,2% de la R.D. del Congo en el suministro mundial de cobalto.' },
+            { id: 2, tag: 'Finanzas', text: 'Informe sobre Estereotipos Mediáticos (2024) — Sobrecosto de US$ 4.200 millones anuales en intereses de deuda soberana.' },
+            { id: 3, tag: 'Ambiente', text: 'Monitor Global de E-Waste (ONU) — Generación de 62 millones de toneladas de desechos electrónicos en 2022.' },
+            { id: 4, tag: 'Digital', text: 'Infraestructura de Telecomunicaciones — Control extranjero del 85% al 95% del tráfico internacional de internet en África.' },
+            { id: 5, tag: 'Minería', text: 'Producción Mineral RDC — Extracción de 230.000 toneladas métricas de cobalto para transición energética y electrónica.' },
+            { id: 6, tag: 'Trabajo', text: 'Sector Artesanal Congoleño — Entre el 15% y el 30% del cobalto proviene de minería artesanal e informal.' },
+            { id: 7, tag: 'Derechos', text: 'Condiciones Laborales en Minería Informal — Precariedad extrema, riesgos sanitarios y trabajo infantil por pobreza endémica.' },
+            { id: 8, tag: 'Normativa', text: 'Convenio de Basilea — Prohibición internacional de exportar residuos peligrosos hacia países en desarrollo.' },
+            { id: 9, tag: 'Comercio', text: 'Vacío Legal de "Productos Reparables" — Mecanismo utilizado por intermediarios para introducir chatarra electrónica en África.' },
+            { id: 10, tag: 'Ambiente', text: 'Agbogbloshie (Ghana) — Liberación de plomo, cadmio y mercurio por incineración al aire libre de cables.' },
+            { id: 11, tag: 'Hídrico', text: 'Contaminación del Río Odaw — Filtración directa de metales pesados en los sistemas hídricos locales.' },
+            { id: 12, tag: 'Salud', text: 'Bioacumulación Alimentaria — Contaminación irreversible en cultivos, peces y ganado de consumo humano.' },
+            { id: 13, tag: 'Digital', text: 'Colonialismo Digital — Extracción de datos conductuales como materia prima y marginación de lenguas nativas.' },
+            { id: 14, tag: 'Medios', text: 'Economía de la Atención — Priorización algorítmica de narrativas de crisis, conflicto y pobreza.' },
+            { id: 15, tag: 'Medios', text: 'Sesgo Mediático Estructural — Invisibilización de la diversidad económica y social del continente africano.' },
+            { id: 16, tag: 'Finanzas', text: 'Percepción Artificial de Riesgo — Penalización crediticia internacional derivada de encuadres informativos negativos.' },
+            { id: 17, tag: 'Medios', text: 'Cobertura Electoral en Kenia — 88% de noticias globales con tono negativo durante periodos electorales.' },
+            { id: 18, tag: 'Comparativa', text: 'Asimetría Regional — Solo 48% de tono negativo en economías asiáticas con perfil de riesgo político idéntico.' },
+            { id: 19, tag: 'Sátira', text: 'Albert Ohams (Nigeria) — Caricatura política africana como denuncia de la represión y asimetría de poder.' },
+            { id: 20, tag: 'Análisis', text: 'Punto 4 (Guía 2) — Crítica a la hipocresía de la globalización desigual y la invisibilización extractiva.' },
+            { id: 21, tag: 'Innovación', text: 'Silicon Savannah (Nairobi, Kenia) — Ecosistema tecnológico líder en salto tecnológico (leapfrogging).' },
+            { id: 22, tag: 'Finanzas', text: 'Inclusión Financiera Móvil — Plataformas digitales africanas que superaron la infraestructura bancaria obsoleta.' },
+            { id: 23, tag: 'IA', text: 'Investigación Comunitaria de IA — Desarrollo colaborativo de Procesamiento de Lenguaje Natural (PLN).' },
+            { id: 24, tag: 'Soberanía', text: 'Preservación Lingüística Digital — Herramientas de IA para cientos de lenguas indígenas africanas.' },
+            { id: 25, tag: 'Cultura', text: 'Cosmogonía y Tecnología — Movimientos culturales que articulan identidad ancestral y avance tecnológico.' },
+            { id: 26, tag: 'Futuro', text: 'Narrativas de Agencia — África como fuerza creadora y soberana de su propio desarrollo.' }
+        ];
+
+        function wrapLabel(text, maxLen = 16) {
+            if (text.length <= maxLen) return text;
+            const words = text.split(' ');
+            const lines = [];
+            let current = '';
+            words.forEach(w => {
+                if ((current + w).length > maxLen) {
+                    if (current) lines.push(current.trim());
+                    current = w + ' ';
+                } else {
+                    current += w + ' ';
+                }
+            });
+            if (current) lines.push(current.trim());
+            return lines;
+        }
+
+        let cobaltChart = null;
+        let mediaChart = null;
+
+        function initVisualizations() {
+            const ctx1 = document.getElementById('cobaltChart').getContext('2d');
+            cobaltChart = new Chart(ctx1, {
+                type: 'doughnut',
+                data: {
+                    labels: [wrapLabel('R.D. del Congo (230.000 t)'), wrapLabel('Resto del Mundo (80.000 t)')],
+                    datasets: [{
+                        data: [74.2, 25.8],
+                        backgroundColor: ['#1E3A8A', '#CBD5E1'],
+                        borderColor: '#FFFFFF',
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { family: 'Inter', size: 12 } } },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => ` ${ctx.label}: ${ctx.parsed}%`
+                            }
+                        }
+                    }
+                }
+            });
+
+            const ctx2 = document.getElementById('mediaBiasChart').getContext('2d');
+            mediaChart = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: [wrapLabel('Kenia (África)'), wrapLabel('Economías Asiáticas Comparables')],
+                    datasets: [{
+                        label: 'Noticias Globales con Tono Negativo (%)',
+                        data: [88, 48],
+                        backgroundColor: ['#B45309', '#1E3A8A'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { callback: val => val + '%' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => ` Cobertura negativa: ${ctx.parsed.y}%`
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        document.getElementById('btn-cobalt-world').addEventListener('click', function() {
+            this.className = 'px-2.5 py-1 rounded-md bg-[#1E3A8A] text-white font-semibold transition';
+            document.getElementById('btn-cobalt-sector').className = 'px-2.5 py-1 rounded-md text-slate-600 font-semibold hover:text-slate-900 transition';
+            document.getElementById('cobalt-description').textContent = 'La República Democrática del Congo produce 230.000 toneladas métricas de cobalto, concentrando el 74,2% del suministro minero mundial indispensable para baterías y electrónica [Cita 1, 5].';
+            cobaltChart.data.labels = [wrapLabel('R.D. del Congo (230.000 t)'), wrapLabel('Resto del Mundo (80.000 t)')];
+            cobaltChart.data.datasets[0].data = [74.2, 25.8];
+            cobaltChart.data.datasets[0].backgroundColor = ['#1E3A8A', '#CBD5E1'];
+            cobaltChart.update();
+        });
+
+        document.getElementById('btn-cobalt-sector').addEventListener('click', function() {
+            this.className = 'px-2.5 py-1 rounded-md bg-[#1E3A8A] text-white font-semibold transition';
+            document.getElementById('btn-cobalt-world').className = 'px-2.5 py-1 rounded-md text-slate-600 font-semibold hover:text-slate-900 transition';
+            document.getElementById('cobalt-description').textContent = 'Dentro de la R.D. del Congo, entre el 15% y el 30% (valor medio 22,5%) proviene de la minería artesanal e informal, caracterizada por alta vulnerabilidad laboral [Cita 6, 7].';
+            cobaltChart.data.labels = [wrapLabel('Minería Industrial Formal'), wrapLabel('Minería Artesanal e Informal')];
+            cobaltChart.data.datasets[0].data = [77.5, 22.5];
+            cobaltChart.data.datasets[0].backgroundColor = ['#334155', '#B45309'];
+            cobaltChart.update();
+        });
+
+        document.getElementById('btn-media-tone').addEventListener('click', function() {
+            this.className = 'px-2.5 py-1 rounded-md bg-[#1E3A8A] text-white font-semibold transition';
+            document.getElementById('btn-media-cost').className = 'px-2.5 py-1 rounded-md text-slate-600 font-semibold hover:text-slate-900 transition';
+            document.getElementById('media-description').textContent = 'Durante periodos electorales, el 88% de las noticias globales sobre Kenia adoptaron un tono negativo, frente a solo un 48% para economías asiáticas con un perfil de riesgo político idéntico [Cita 17, 18].';
+            mediaChart.data.labels = [wrapLabel('Kenia (África)'), wrapLabel('Economías Asiáticas Comparables')];
+            mediaChart.data.datasets[0].data = [88, 48];
+            mediaChart.data.datasets[0].backgroundColor = ['#B45309', '#1E3A8A'];
+            mediaChart.options.scales.y.max = 100;
+            mediaChart.options.scales.y.ticks.callback = val => val + '%';
+            mediaChart.options.plugins.tooltip.callbacks.label = ctx => ` Cobertura negativa: ${ctx.parsed.y}%`;
+            mediaChart.update();
+        });
+
+        document.getElementById('btn-media-cost').addEventListener('click', function() {
+            this.className = 'px-2.5 py-1 rounded-md bg-[#1E3A8A] text-white font-semibold transition';
+            document.getElementById('btn-media-tone').className = 'px-2.5 py-1 rounded-md text-slate-600 font-semibold hover:text-slate-900 transition';
+            document.getElementById('media-description').textContent = 'El sobrecosto por intereses de deuda soberana atribuido a los estereotipos mediáticos asciende a US$ 4.200 millones anuales (equivalente a US$ 350 millones mensuales desviados del desarrollo público) [Cita 2, 16].';
+            mediaChart.data.labels = [wrapLabel('Sobrecosto Anual Deuda (Millones US$)'), wrapLabel('Impacto Trimestral Acumulado (Millones US$)')];
+            mediaChart.data.datasets[0].data = [4200, 1050];
+            mediaChart.data.datasets[0].backgroundColor = ['#B45309', '#475569'];
+            mediaChart.options.scales.y.max = 5000;
+            mediaChart.options.scales.y.ticks.callback = val => 'US$ ' + val + 'M';
+            mediaChart.options.plugins.tooltip.callbacks.label = ctx => ` US$ ${ctx.parsed.y} Millones`;
+            mediaChart.update();
+        });
+
+        function setEwasteStage(index) {
+            const stage = ewasteStages[index];
+            document.getElementById('ewaste-stage-badge').textContent = stage.badge;
+            document.getElementById('ewaste-stage-ref').textContent = stage.ref;
+            document.getElementById('ewaste-stage-title').textContent = stage.title;
+            document.getElementById('ewaste-stage-text').textContent = stage.text;
+
+            document.querySelectorAll('.ewaste-tab').forEach((btn, i) => {
+                if (i === index) {
+                    btn.className = 'ewaste-tab py-2 px-2.5 rounded-lg text-xs font-semibold bg-[#1E3A8A] text-white text-center transition';
+                } else {
+                    btn.className = 'ewaste-tab py-2 px-2.5 rounded-lg text-xs font-semibold bg-[#FBF9F5] text-slate-700 border border-stone-200 text-center hover:bg-stone-100 transition';
+                }
+            });
+        }
+
+        function renderCitations(query = '') {
+            const container = document.getElementById('citations-list');
+            container.innerHTML = '';
+            const normalized = query.trim().toLowerCase();
+
+            const filtered = citationsData.filter(c =>
+                c.text.toLowerCase().includes(normalized) ||
+                c.tag.toLowerCase().includes(normalized) ||
+                `cita ${c.id}`.includes(normalized) ||
+                String(c.id) === normalized
+            );
+
+            filtered.forEach(c => {
+                const item = document.createElement('div');
+                item.id = `citation-item-${c.id}`;
+                item.className = 'p-3.5 rounded-lg bg-[#FBF9F5] border border-stone-200 flex items-start gap-3 transition-colors';
+                item.innerHTML = `
+                    <span class="px-2 py-0.5 rounded bg-white border border-stone-300 text-xs font-bold text-[#1E3A8A] shrink-0">[${c.id}]</span>
+                    <div>
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-[#B45309] block mb-0.5">${c.tag}</span>
+                        <span class="text-slate-700 leading-snug">${c.text}</span>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function highlightCitation(id) {
+            const searchInput = document.getElementById('citation-search');
+            searchInput.value = '';
+            renderCitations('');
+            const target = document.getElementById(`citation-item-${id}`);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                target.classList.add('border-[#1E3A8A]', 'bg-blue-50/60');
+                setTimeout(() => {
+                    target.classList.remove('border-[#1E3A8A]', 'bg-blue-50/60');
+                }, 2200);
+            }
+        }
+
+        document.getElementById('citation-search').addEventListener('input', e => {
+            renderCitations(e.target.value);
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initVisualizations();
+            renderCitations('');
+        });
+    </script>
+</body>
+</html>
